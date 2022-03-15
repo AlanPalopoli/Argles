@@ -150,6 +150,10 @@ function chequearPalabra(letraOpalabra)
     {
         console.log("Lo lamento, has perdido el juego. ¡Vuelve a intentarlo!")
     }
+}*/
+
+function chequearPalabra(){
+    
 }
 
 /*-----------------------JUEGO-----------------------*/
