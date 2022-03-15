@@ -77,7 +77,7 @@ function rellenoPalabra()
     document.body.appendChild(divPalabra)
 }
 
-function chequearPalabra(letraOpalabra)
+/*function chequearPalabra(letraOpalabra)
 {
     let PospalabraAux = []
     let contadorAux = 0
@@ -152,13 +152,38 @@ function chequearPalabra(letraOpalabra)
     }
 }*/
 
-function chequearPalabra(){
-    
+function chequearPalabra(palabraCheck){
+    if(palabraCheck == juego.palabraRandom.toUpperCase()){
+        console.log("Felicitaciones, advinaste la palabra. Has ganado el juego")
+    }
+    else
+    {
+        for(i=0; i <= palabraCheck.length; i++){
+            if((juego.palabraRandom.toUpperCase()).includes(palabraCheck[i])){
+                 if((juego.palabraRandom[i].toUpperCase()) == palabraCheck[i]){
+                     console.log("ES IGUAL LA LETRA")//ES IGUAL SE PONE VERDE LA CASILLA
+                 }
+                 else
+                 {
+                    console.log("NO ES IGUAL PERO EXISTE") //NO ES IGUAL PERO ESTÁ, SE PONE AMARILLA
+                 }
+            }
+            else {
+                console.log("NO EXISTE")//NO ESTÁ, SE PONE GRIS
+            }
+        }
+        
+        console.log("La palabra es incorrecta, sigue intentando")
+        fila ++
+        col = 0
+    }
+    palabraFinal = ""
+    entroCheck = 0
 }
 
 /*-----------------------JUEGO-----------------------*/
 
-let ArrayletrasAbecedario = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","ñ","o","p","q","r","s","t","u","v","w","x","y","z"]
+let ArrayletrasAbecedario = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","Ñ","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
 let arrayLetras = []
 let divLetras = document.getElementById("letras1")
 let divLetras2 = document.getElementById("letras2")
@@ -166,7 +191,11 @@ let divLetras3 = document.getElementById("letras3")
 let buttonLetras = []
 let divBox = document.getElementById("main")
 let divBoxCol
-const juego = new Juego (["palabra", "colegio","puerta","hombre","mujer"], 6, "", 0, 0, "", [], [])
+let palabraFinal = ""
+let fila = 0
+let col = 0
+let entroCheck = 0
+const juego = new Juego (["palab", "coleg","puert","hombr","mujer"], 6, "", 0, 0, "", [], [])
 
 ArrayletrasAbecedario.forEach((letraEnArray, indice)=>{
     const letra = new Letras(indice,letraEnArray)
@@ -220,14 +249,41 @@ for (let i=0;i<arrayLetras.length; i++){
     })
 } 
 
-window.addEventListener("keydown", function (event) {
-    arrayLetras.forEach((letra) => {
-        if(event.key == letra.letra)
-        {
-            chequearPalabra((letra.letra))
-        }
-    })
-  },false);
+window.addEventListener("keydown", function (event) {  
+    if(ArrayletrasAbecedario.includes(event.key.toUpperCase()))
+    {
+        let filLetra = document.getElementById(`rowBox ${fila}`)
+        //let colLetra = document.getElementById(`colBox ${col}`)
+        //console.log(`colBox ${col}`)
+        //console.log(`filBox ${fila}`)
+        palabraFinal = palabraFinal.concat(event.key.toUpperCase())
+        //console.log(palabraFinal) 
+        filLetra.children[col].innerHTML += 
+        `
+        <font size="+3"><b>${event.key.toUpperCase()}</b></font>
+        `
+        col++
+        //chequearPalabra((letra.letra))
+    }
+    else if (event.key == 'Enter')
+    {
+        chequearPalabra(palabraFinal)
+        //console.log(palabraFinal)
+        //console.log("asd")
+
+    }
+    else if (event.key == 'Backspace')
+    {
+        col--
+        let filLetra = document.getElementById(`rowBox ${fila}`)
+        //let colLetra = document.getElementById(`colBox ${col}`)
+        palabraFinal = palabraFinal.slice(0, -1);
+        //console.log(palabraFinal)
+        //colLetra.innerHTML = ""
+        filLetra.children[col].innerHTML = ""
+        //console.log("Entro en backspace")
+    }
+},false);
 
 console.log(juego.palabraRandom) //Habilitar para saber cual es la palabra
 
