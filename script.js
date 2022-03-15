@@ -25,7 +25,7 @@ function aleatorio(min,max)
     return Math.random()*(max-min)+min;
 }    
 
-function rellenoPalabra()
+/*function rellenoPalabra()
 {
     let palabraOut = []
     let contador = 0
@@ -75,7 +75,7 @@ function rellenoPalabra()
         divPalabra.innerHTML = `${(palabraOut.toString()).replaceAll(',', '')}`
     }
     document.body.appendChild(divPalabra)
-}
+}*/
 
 /*function chequearPalabra(letraOpalabra)
 {
@@ -155,6 +155,7 @@ function rellenoPalabra()
 function chequearPalabra(palabraCheck){
     if(palabraCheck == juego.palabraRandom.toUpperCase()){
         console.log("Felicitaciones, advinaste la palabra. Has ganado el juego")
+        juego.victoria = 1
     }
     else
     {
@@ -176,13 +177,59 @@ function chequearPalabra(palabraCheck){
         console.log("La palabra es incorrecta, sigue intentando")
         fila ++
         col = 0
+        juego.vidas --
     }
     palabraFinal = ""
 }
 
+function rellenarBox(letra){
+    if(juego.victoria == 0 && juego.vidas > 0){
+        if(ArrayletrasAbecedario.includes(letra) && (letra != "BORRAR") && (letra != "ENTER"))
+        {
+            if(palabraFinal.length < 5){
+                let filLetra = document.getElementById(`rowBox ${fila}`)
+                palabraFinal = palabraFinal.concat(letra)
+                //console.log(palabraFinal) 
+                filLetra.children[col].innerHTML += 
+                `
+                <font size="+3"><b>${letra}</b></font>
+                `
+                col++
+            }  
+        }
+        else if (letra == 'ENTER')
+        {
+            if(palabraFinal.length == 5){
+                chequearPalabra(palabraFinal)
+            }
+            else
+            {
+                alert("Debes ingresar 5 letras para enviar la palabra")
+            }
+        }
+        else if (letra == 'BACKSPACE' || letra == 'BORRAR')
+        {
+            if (col > 0 )
+            {    
+                col--
+                console.log(col)
+                let filLetra = document.getElementById(`rowBox ${fila}`)
+                palabraFinal = palabraFinal.slice(0, -1);
+                filLetra.children[col].innerHTML = ""
+            }
+        }
+    }
+    else if (juego.victoria == 1){
+        alert("Ya has ganado el juego.")
+    }
+    else if (juego.vidas <= 0)
+    {
+        alert("Lo lamento, has perdido el juego") 
+    }
+}
 /*-----------------------JUEGO-----------------------*/
 
-let ArrayletrasAbecedario = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","Ñ","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+let ArrayletrasAbecedario = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","Ñ","O","P","Q","R","S","T","U","V","W","X","Y","Z","BORRAR","ENTER"]
 let arrayLetras = []
 let divLetras = document.getElementById("letras1")
 let divLetras2 = document.getElementById("letras2")
@@ -193,7 +240,6 @@ let divBoxCol
 let palabraFinal = ""
 let fila = 0
 let col = 0
-let entroCheck = 0
 const juego = new Juego (["palab", "coleg","puert","hombr","mujer"], 6, "", 0, 0, "", [], [])
 
 ArrayletrasAbecedario.forEach((letraEnArray, indice)=>{
@@ -216,7 +262,7 @@ for(i=0;i<=5;i++){
 document.body.appendChild(divBox)
 
 juego.palabraRandom = juego.palabras[Math.floor(aleatorio(0,5))];
-rellenoPalabra()
+//rellenoPalabra()
 
 arrayLetras.forEach((letra, indice) => {
     if(indice <= 8) {
@@ -224,13 +270,13 @@ arrayLetras.forEach((letra, indice) => {
         <button class="btn btn-secondary" id="Letra ${letra.id}"> ${letra.letra} </button>
         `
     }
-    else if (indice > 8 && indice <= 17)
+    else if (indice > 8 && indice <= 18)
     {
         divLetras2.innerHTML += `
         <button class="btn btn-secondary" id="Letra ${letra.id}"> ${letra.letra} </button>
         `
     }
-    else if (indice > 17)
+    else if (indice > 18)
     {
         divLetras3.innerHTML += `
         <button class="btn btn-secondary" id="Letra ${letra.id}"> ${letra.letra} </button>
@@ -241,52 +287,69 @@ arrayLetras.forEach((letra, indice) => {
     document.body.appendChild(divLetras3)
 })
 
+/*--------------------------------TECLADO PANTALLA Y MANUAL---------------------------------------- */
 for (let i=0;i<arrayLetras.length; i++){
     buttonLetras[i] = document.getElementById(`Letra ${i}`)
     buttonLetras[i].addEventListener('click', () => {
-        chequearPalabra((arrayLetras[i].letra))
+        rellenarBox((arrayLetras[i].letra))
     })
 } 
 
-window.addEventListener("keydown", function (event) {  
-    if(ArrayletrasAbecedario.includes(event.key.toUpperCase()))
-    {
-        let filLetra = document.getElementById(`rowBox ${fila}`)
-        //let colLetra = document.getElementById(`colBox ${col}`)
-        //console.log(`colBox ${col}`)
-        //console.log(`filBox ${fila}`)
-        palabraFinal = palabraFinal.concat(event.key.toUpperCase())
-        //console.log(palabraFinal) 
-        filLetra.children[col].innerHTML += 
-        `
-        <font size="+3"><b>${event.key.toUpperCase()}</b></font>
-        `
-        col++
-        //chequearPalabra((letra.letra))
-    }
-    else if (event.key == 'Enter')
-    {
-        chequearPalabra(palabraFinal)
-        //console.log(palabraFinal)
-        //console.log("asd")
-
-    }
-    else if (event.key == 'Backspace')
-    {
-        col--
-        let filLetra = document.getElementById(`rowBox ${fila}`)
-        //let colLetra = document.getElementById(`colBox ${col}`)
-        palabraFinal = palabraFinal.slice(0, -1);
-        //console.log(palabraFinal)
-        //colLetra.innerHTML = ""
-        filLetra.children[col].innerHTML = ""
-        //console.log("Entro en backspace")
-    }
+window.addEventListener("keydown", function (event) {
+    rellenarBox(event.key.toUpperCase())
 },false);
+
+/*------------------------------------------------------------------------------------------------ */
 
 console.log(juego.palabraRandom) //Habilitar para saber cual es la palabra
 
-
+/*
+window.addEventListener("keydown", function (event) {
+    if(juego.victoria == 0 && juego.vidas > 0){
+        if(ArrayletrasAbecedario.includes(event.key.toUpperCase()))
+        {
+            if(palabraFinal.length < 5){
+                let filLetra = document.getElementById(`rowBox ${fila}`)
+                palabraFinal = palabraFinal.concat(event.key.toUpperCase())
+                //console.log(palabraFinal) 
+                filLetra.children[col].innerHTML += 
+                `
+                <font size="+3"><b>${event.key.toUpperCase()}</b></font>
+                `
+                col++
+            }  
+        }
+        else if (event.key == 'Enter')
+        {
+            if(palabraFinal.length == 5){
+                chequearPalabra(palabraFinal)
+            }
+            else
+            {
+                alert("Debes ingresar 5 letras para enviar la palabra")
+            }
+        }
+        else if (event.key == 'Backspace')
+        {
+            if (col > 0 )
+            {    
+                col--
+                console.log(col)
+                let filLetra = document.getElementById(`rowBox ${fila}`)
+                palabraFinal = palabraFinal.slice(0, -1);
+                filLetra.children[col].innerHTML = ""
+            }
+        }
+    }
+    else if (juego.victoria == 1){
+        alert("Ya has ganado el juego.")
+    }
+    else if (juego.vidas <= 0)
+    {
+        alert("Lo lamento, has perdido el juego") 
+    }
+},false);
+*/
 
 /* buttonLetra.addEventListener('click', () => {
     ArrayletrasAbecedario.forEach((letraEnArray, indice)=>{
