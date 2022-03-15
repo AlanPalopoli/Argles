@@ -178,7 +178,6 @@ function chequearPalabra(palabraCheck){
         col = 0
     }
     palabraFinal = ""
-    entroCheck = 0
 }
 
 /*-----------------------JUEGO-----------------------*/
