@@ -26,32 +26,30 @@ function aleatorio(min,max)
 }    
 
 function chequearPalabra(palabraCheck){
-    if(palabraCheck == juego.palabraRandom.toUpperCase()){
-        console.log("Felicitaciones, advinaste la palabra. Has ganado el juego")
-        juego.victoria = 1
-    }
-    else
-    {
-        for(i=0; i <= palabraCheck.length; i++){
-            if((juego.palabraRandom.toUpperCase()).includes(palabraCheck[i])){
-                 if((juego.palabraRandom[i].toUpperCase()) == palabraCheck[i]){
-                     console.log("ES IGUAL LA LETRA")//ES IGUAL SE PONE VERDE LA CASILLA
-                 }
-                 else
-                 {
-                    console.log("NO ES IGUAL PERO EXISTE") //NO ES IGUAL PERO ESTÁ, SE PONE AMARILLA
-                 }
-            }
-            else {
-                console.log("NO EXISTE")//NO ESTÁ, SE PONE GRIS
-            }
+    for(i=0; i < palabraCheck.length; i++){
+        if((juego.palabraRandom.toUpperCase()).includes(palabraCheck[i])){
+                if((juego.palabraRandom[i].toUpperCase()) == palabraCheck[i]){ //ES IGUAL SE PONE VERDE LA CASILLA
+                    let filLetra = document.getElementById(`rowBox ${fila}`)
+                    filLetra.children[i].className = "card text-white bg-success";
+                    if(palabraCheck == juego.palabraRandom.toUpperCase()){
+                        juego.victoria = 1
+                    }
+                }
+                else //NO ES IGUAL PERO ESTÁ, SE PONE AMARILLA
+                {
+                    let filLetra = document.getElementById(`rowBox ${fila}`)
+                    filLetra.children[i].className = "card text-white bg-warning";
+                }
         }
-        
-        console.log("La palabra es incorrecta, sigue intentando")
-        fila ++
-        col = 0
-        juego.vidas --
+        else //NO ESTÁ, SE PONE GRIS
+        {
+            let filLetra = document.getElementById(`rowBox ${fila}`)
+            filLetra.children[i].className = "card text-white bg-secondary";
+        }
     }
+    fila ++
+    col = 0
+    juego.vidas --
     palabraFinal = ""
 }
 
@@ -62,7 +60,6 @@ function rellenarBox(letra){
             if(palabraFinal.length < 5){
                 let filLetra = document.getElementById(`rowBox ${fila}`)
                 palabraFinal = palabraFinal.concat(letra)
-                //console.log(palabraFinal) 
                 filLetra.children[col].innerHTML += 
                 `
                 <font size="+3"><b>${letra}</b></font>
@@ -73,6 +70,8 @@ function rellenarBox(letra){
         else if (letra == 'ENTER')
         {
             if(palabraFinal.length == 5){
+                palabraStorage.push(palabraFinal)
+                localStorage.setItem('Palabras', palabraStorage)
                 chequearPalabra(palabraFinal)
             }
             else
@@ -113,7 +112,8 @@ let divBoxCol
 let palabraFinal = ""
 let fila = 0
 let col = 0
-const juego = new Juego (["palab", "coleg","puert","hombr","mujer"], 6, "", 0, 0, "", [], [])
+let palabraStorage = []
+const juego = new Juego (["palas", "comer","pared","mirar","mujer"], 6, "", 0, 0, "", [], [])
 
 ArrayletrasAbecedario.forEach((letraEnArray, indice)=>{
     const letra = new Letras(indice,letraEnArray)
@@ -135,7 +135,6 @@ for(i=0;i<=5;i++){
 document.body.appendChild(divBox)
 
 juego.palabraRandom = juego.palabras[Math.floor(aleatorio(0,5))];
-//rellenoPalabra()
 
 arrayLetras.forEach((letra, indice) => {
     if(indice <= 8) {
@@ -174,92 +173,21 @@ window.addEventListener("keydown", function (event) {
 
 /*------------------------------------------------------------------------------------------------ */
 
-console.log(juego.palabraRandom) //Habilitar para saber cual es la palabra
-
-/*
-window.addEventListener("keydown", function (event) {
-    if(juego.victoria == 0 && juego.vidas > 0){
-        if(ArrayletrasAbecedario.includes(event.key.toUpperCase()))
-        {
-            if(palabraFinal.length < 5){
-                let filLetra = document.getElementById(`rowBox ${fila}`)
-                palabraFinal = palabraFinal.concat(event.key.toUpperCase())
-                //console.log(palabraFinal) 
-                filLetra.children[col].innerHTML += 
-                `
-                <font size="+3"><b>${event.key.toUpperCase()}</b></font>
-                `
-                col++
-            }  
-        }
-        else if (event.key == 'Enter')
-        {
-            if(palabraFinal.length == 5){
-                chequearPalabra(palabraFinal)
-            }
-            else
-            {
-                alert("Debes ingresar 5 letras para enviar la palabra")
-            }
-        }
-        else if (event.key == 'Backspace')
-        {
-            if (col > 0 )
-            {    
-                col--
-                console.log(col)
-                let filLetra = document.getElementById(`rowBox ${fila}`)
-                palabraFinal = palabraFinal.slice(0, -1);
-                filLetra.children[col].innerHTML = ""
-            }
-        }
+if(localStorage.getItem('Palabras')){
+    let storage = localStorage.getItem('Palabras')
+    let arrayPalabra = storage.split(",", storage.length);
+    for(j=0;j<arrayPalabra.length;j++){
+        chequearPalabra(arrayPalabra[j])
     }
-    else if (juego.victoria == 1){
-        alert("Ya has ganado el juego.")
+    fila = 0
+    for(let i=0;i<storage.length;i++){
+        if(storage[i] == ','){
+            i++
+            fila++
+            palabraFinal = ""
+            col = 0
+        }
+        rellenarBox(storage[i])
     }
-    else if (juego.vidas <= 0)
-    {
-        alert("Lo lamento, has perdido el juego") 
-    }
-},false);
-*/
-
-/* buttonLetra.addEventListener('click', () => {
-    ArrayletrasAbecedario.forEach((letraEnArray, indice)=>{
-        const letra = new Letras(indice,letraEnArray)
-        arrayLetras.push(letra)
-    })
-}) */
-
-
-
-/*
-buttonLetras.addEventListener('click', () => { 
-    console.log("Toco un botonazo!")
-})
-arrayLetras.forEach((letra)=> { 
-    arrayLetras.addEventListener('click', () => {
-        console.log("Toco un botonazo!")
-    })   
-})*/
-
-/*arrayLetras.forEach(letra => {
-    letra.addEventListener('click', () => {
-        console.log("Toco un botonazo!")
-    })   
-})
-
-
-
-
-
-
-/*while (juego.vidas > 0 && juego.victoria == 0 )
-{
-    juego.frase = prompt ("Ingrese una letra o palabra")
-    chequearPalabra(juego.frase)
 }
-if (juego.vidas == 0)
-{
-    console.log("Lo lamento, has perdido el juego. ¡Vuelve a intentarlo!")
-}*/
+//console.log(juego.palabraRandom) //Habilitar para saber cual es la palabra
