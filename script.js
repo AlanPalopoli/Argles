@@ -76,7 +76,12 @@ function rellenarBox(letra){
             }
             else
             {
-                alert("Debes ingresar 5 letras para enviar la palabra")
+                Toastify({
+                    text: "Debes ingresar 5 letras para enviar la palabra",
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'right',
+                }).showToast();
             }
         }
         else if (letra == 'BACKSPACE' || letra == 'BORRAR')
@@ -92,11 +97,19 @@ function rellenarBox(letra){
         }
     }
     else if (juego.victoria == 1){
-        alert("Ya has ganado el juego.")
+        swal({
+            title: '¡Felicitaciones!',
+            text: 'Has ganado el juego.',
+            icon: 'success'
+          })
     }
     else if (juego.vidas <= 0)
     {
-        alert("Lo lamento, has perdido el juego") 
+        swal({
+            title: '¡Lo lamento!',
+            text: 'Has perdido el juego.',
+            icon: 'error'
+            })
     }
 }
 /*-----------------------JUEGO-----------------------*/
