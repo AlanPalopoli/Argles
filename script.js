@@ -70,7 +70,11 @@ function rellenarBox(letra){
         else if (letra == 'ENTER')
         {
             if(palabraFinal.length == 5){
-                palabraStorage.push(palabraFinal)
+                if(localStorage.getItem('Palabras')){
+                    let storage = localStorage.getItem('Palabras')
+                    palabraStorage = storage
+                }
+                palabraStorage.length == 0 ? palabraStorage = palabraFinal : palabraStorage = palabraStorage + ',' + palabraFinal
                 localStorage.setItem('Palabras', palabraStorage)
                 chequearPalabra(palabraFinal)
             }
@@ -146,8 +150,17 @@ for(i=0;i<=5;i++){
 }
 
 document.body.appendChild(divBox)
+if (!localStorage.getItem('PalabraAdivinar'))
+{
+    juego.palabraRandom = juego.palabras[Math.floor(aleatorio(0,5))];
+    localStorage.setItem('PalabraAdivinar', juego.palabraRandom)
+}
+else
+{
+    let storage = localStorage.getItem('PalabraAdivinar')
+    juego.palabraRandom = storage
+}
 
-juego.palabraRandom = juego.palabras[Math.floor(aleatorio(0,5))];
 
 arrayLetras.forEach((letra, indice) => {
     if(indice <= 8) {
@@ -189,10 +202,6 @@ window.addEventListener("keydown", function (event) {
 if(localStorage.getItem('Palabras')){
     let storage = localStorage.getItem('Palabras')
     let arrayPalabra = storage.split(",", storage.length);
-    for(j=0;j<arrayPalabra.length;j++){
-        chequearPalabra(arrayPalabra[j])
-    }
-    fila = 0
     for(let i=0;i<storage.length;i++){
         if(storage[i] == ','){
             i++
@@ -201,6 +210,10 @@ if(localStorage.getItem('Palabras')){
             col = 0
         }
         rellenarBox(storage[i])
+    }
+    fila = 0
+    for(j=0;j<arrayPalabra.length;j++){
+        chequearPalabra(arrayPalabra[j])
     }
 }
 //console.log(juego.palabraRandom) //Habilitar para saber cual es la palabra
