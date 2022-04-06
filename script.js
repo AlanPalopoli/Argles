@@ -25,27 +25,61 @@ function aleatorio(min,max)
     return Math.random()*(max-min)+min;
 }    
 
+function cuantasVecesAparece(cadena, caracter){
+    var indices = [];
+    for(var h = 0; h < cadena.length; h++) {
+      if (cadena[h] === caracter) indices.push(h);
+    }
+      return indices.length;
+  }
+
+function posicionLetraCorrecta(cadena , posCaracter){
+    if(cadena.includes(posCaracter)) return true
+    else return false
+}
+
 function chequearPalabra(palabraCheck){
+    let letraAcertada = []
+    let letraAcertadaPos = []
+    let j = 0
     for(i=0; i < palabraCheck.length; i++){
-        if((juego.palabraRandom.toUpperCase()).includes(palabraCheck[i])){
-                if((juego.palabraRandom[i].toUpperCase()) == palabraCheck[i]){ //ES IGUAL SE PONE VERDE LA CASILLA
+        if((juego.palabraRandom.toUpperCase()).includes(palabraCheck[i]))
+        {       
+            while (j < palabraCheck.length)
+            {
+                if((juego.palabraRandom[j].toUpperCase()) == palabraCheck[j])
+                { //ES IGUAL SE PONE VERDE LA CASILLA
                     let filLetra = document.getElementById(`rowBox ${fila}`)
-                    filLetra.children[i].className = "card text-white bg-success";
-                    if(palabraCheck == juego.palabraRandom.toUpperCase()){
+                    filLetra.children[j].className = "card text-white bg-success";
+                    letraAcertadaPos.push(j)
+                    letraAcertada.push(palabraCheck[j])
+                    if(palabraCheck == juego.palabraRandom.toUpperCase())
+                    {
                         juego.victoria = 1
                     }
                 }
-                else //NO ES IGUAL PERO ESTÁ, SE PONE AMARILLA
+                else //NO ESTÁ, SE PONE GRIS
+                {
+                    let filLetra = document.getElementById(`rowBox ${fila}`)
+                    filLetra.children[j].className = "card text-white bg-secondary";
+                }
+                j++
+            }
+            if (!posicionLetraCorrecta(letraAcertadaPos,i) )//NO ES IGUAL PERO ESTÁ, SE PONE AMARILLA
+            {
+                if((cuantasVecesAparece(juego.palabraRandom.toUpperCase(), palabraCheck[i])) > (cuantasVecesAparece(letraAcertada.toString(), palabraCheck[i])))
                 {
                     let filLetra = document.getElementById(`rowBox ${fila}`)
                     filLetra.children[i].className = "card text-white bg-warning";
                 }
+            }
         }
         else //NO ESTÁ, SE PONE GRIS
         {
             let filLetra = document.getElementById(`rowBox ${fila}`)
             filLetra.children[i].className = "card text-white bg-secondary";
         }
+        
     }
     fila ++
     col = 0
@@ -93,7 +127,6 @@ function rellenarBox(letra){
             if (col > 0 )
             {    
                 col--
-                console.log(col)
                 let filLetra = document.getElementById(`rowBox ${fila}`)
                 palabraFinal = palabraFinal.slice(0, -1);
                 filLetra.children[col].innerHTML = ""
@@ -116,6 +149,7 @@ function rellenarBox(letra){
             })
     }
 }
+
 /*-----------------------JUEGO-----------------------*/
 
 let ArrayletrasAbecedario = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","Ñ","O","P","Q","R","S","T","U","V","W","X","Y","Z","BORRAR","ENTER"]
@@ -130,7 +164,22 @@ let palabraFinal = ""
 let fila = 0
 let col = 0
 let palabraStorage = []
-const juego = new Juego (["palas", "comer","pared","mirar","mujer"], 6, "", 0, 0, "", [], [])
+let palabraArchivo = []
+
+fetch('/palabras.json')
+    .then( (res) => res.json())
+    .then( (data) => {
+        data.forEach((palabraArch) =>{
+            palabraArchivo.push(palabraArch)
+        })
+    })
+    
+setTimeout(() => {
+    juego.palabras = palabraArchivo
+}, 200);
+
+const juego = new Juego ([], 6, "", 0, 0, "", [], [])
+
 
 ArrayletrasAbecedario.forEach((letraEnArray, indice)=>{
     const letra = new Letras(indice,letraEnArray)
@@ -150,17 +199,18 @@ for(i=0;i<=5;i++){
 }
 
 document.body.appendChild(divBox)
-if (!localStorage.getItem('PalabraAdivinar'))
-{
-    juego.palabraRandom = juego.palabras[Math.floor(aleatorio(0,5))];
-    localStorage.setItem('PalabraAdivinar', juego.palabraRandom)
-}
-else
-{
-    let storage = localStorage.getItem('PalabraAdivinar')
-    juego.palabraRandom = storage
-}
-
+setTimeout(() => {
+    if (!localStorage.getItem('PalabraAdivinar'))
+    {
+        juego.palabraRandom = juego.palabras[Math.floor(aleatorio(0,1668))];
+        localStorage.setItem('PalabraAdivinar', juego.palabraRandom)
+    }
+    else
+    {
+        let storage = localStorage.getItem('PalabraAdivinar')
+        juego.palabraRandom = storage
+    }
+}, 300);
 
 arrayLetras.forEach((letra, indice) => {
     if(indice <= 8) {
@@ -198,22 +248,23 @@ window.addEventListener("keydown", function (event) {
 },false);
 
 /*------------------------------------------------------------------------------------------------ */
-
-if(localStorage.getItem('Palabras')){
-    let storage = localStorage.getItem('Palabras')
-    let arrayPalabra = storage.split(",", storage.length);
-    for(let i=0;i<storage.length;i++){
-        if(storage[i] == ','){
-            i++
-            fila++
-            palabraFinal = ""
-            col = 0
+setTimeout(() => {
+    if(localStorage.getItem('Palabras')){
+        let storage = localStorage.getItem('Palabras')
+        let arrayPalabra = storage.split(",", storage.length);
+        for(let i=0;i<storage.length;i++){
+            if(storage[i] == ','){
+                i++
+                fila++
+                palabraFinal = ""
+                col = 0
+            }
+            rellenarBox(storage[i])
         }
-        rellenarBox(storage[i])
+        fila = 0
+        for(j=0;j<arrayPalabra.length;j++){
+            chequearPalabra(arrayPalabra[j])
+        }
     }
-    fila = 0
-    for(j=0;j<arrayPalabra.length;j++){
-        chequearPalabra(arrayPalabra[j])
-    }
-}
+}, 400);
 //console.log(juego.palabraRandom) //Habilitar para saber cual es la palabra
