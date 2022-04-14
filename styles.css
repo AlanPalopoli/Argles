@@ -7,9 +7,15 @@
 }
 
 #letras{
-    margin-top: 10px;
+    display:flex;
 }
+
 .navbar{
     text-align: center;
     width: 512px;
    }
+
+.main {
+    margin-top: 5em;
+    margin-bottom: 5em;
+}

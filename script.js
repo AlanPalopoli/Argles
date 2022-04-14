@@ -96,7 +96,7 @@ function rellenarBox(letra){
                 palabraFinal = palabraFinal.concat(letra)
                 filLetra.children[col].innerHTML += 
                 `
-                <font size="+3"><b>${letra}</b></font>
+                <font size="+4"><b>${letra}</b></font>
                 `
                 col++
             }  
@@ -193,7 +193,7 @@ for(i=0;i<=5;i++){
     for(j=0;j<=4;j++){
         divBoxCol = document.getElementById(`rowBox ${i}`)
         divBoxCol.innerHTML += `
-        <div class="card" style="height: 50px; width: 50px;" id="colBox ${j}"></div>
+        <div class="card" style="height: 62px; width: 62px;" id="colBox ${j}"></div>
         `
     }
 }
@@ -215,19 +215,19 @@ setTimeout(() => {
 arrayLetras.forEach((letra, indice) => {
     if(indice <= 8) {
         divLetras.innerHTML += `
-        <button class="btn btn-secondary" id="Letra ${letra.id}"> ${letra.letra} </button>
+        <button class="btn btn-secondary letras1" id="Letra ${letra.id}"> ${letra.letra} </button>
         `
     }
     else if (indice > 8 && indice <= 18)
     {
         divLetras2.innerHTML += `
-        <button class="btn btn-secondary" id="Letra ${letra.id}"> ${letra.letra} </button>
+        <button class="btn btn-secondary letras2" id="Letra ${letra.id}"> ${letra.letra} </button>
         `
     }
     else if (indice > 18)
     {
         divLetras3.innerHTML += `
-        <button class="btn btn-secondary" id="Letra ${letra.id}"> ${letra.letra} </button>
+        <button class="btn btn-secondary letras3" id="Letra ${letra.id}"> ${letra.letra} </button>
         `
     }
     document.body.appendChild(divLetras)
@@ -246,6 +246,34 @@ for (let i=0;i<arrayLetras.length; i++){
 window.addEventListener("keydown", function (event) {
     rellenarBox(event.key.toUpperCase())
 },false);
+
+let modalButton = document.getElementById("como_jugar")
+let modalEstadisticas = document.getElementById("estadisticas")
+
+modalButton.addEventListener('click', () => {
+    swal({
+        title: 'CÓMO JUGAR',
+        text: `Adivina la palabra oculta en seis intentos.
+
+        Cada intento debe ser una palabra válida de 5 letras.
+        
+        Después de cada intento el color de las letras cambia para mostrar qué tan cerca estás de acertar la palabra.
+        
+        Puede haber letras repetidas. Las pistas son independientes para cada letra y tienen prioridad.
+        `,
+        icon: 'info'
+        })
+})
+
+modalEstadisticas.addEventListener('click', () => {
+    swal({
+        title: 'ESTADISTICAS',
+        text: `
+        `,
+        icon: 'info'
+        })
+})
+
 
 /*------------------------------------------------------------------------------------------------ */
 setTimeout(() => {
