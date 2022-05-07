@@ -25,6 +25,34 @@ function aleatorio(min,max)
     return Math.random()*(max-min)+min;
 }    
 
+function reiniciarJuego(){
+    window.localStorage.removeItem('Palabras');
+    window.localStorage.removeItem('PalabraAdivinar');
+    for(j=0;j<6;j++){
+        for(i=0;i<5;i++){
+            let filLetra = document.getElementById(`rowBox ${j}`)
+            filLetra.children[i].innerHTML = ""
+            filLetra.children[i].className = "card";
+        }
+    }
+    fila = 0
+    col = 0
+    
+    if(juego.vidas > 0){
+        palabraStorage = []
+        let palabrasAdivinadas = []
+        let storage = localStorage.getItem('palabrasAdivinadas')
+        if (storage != null) {
+            palabrasAdivinadas = storage
+        } 
+        palabrasAdivinadas.length == 0 ? palabrasAdivinadas = juego.palabraRandom : palabrasAdivinadas = palabrasAdivinadas + ',' + juego.palabraRandom
+        localStorage.setItem('palabrasAdivinadas', palabrasAdivinadas)
+    }
+    juego = new Juego (palabraArchivo, 6, "", 0, 0, "", [], [])
+    juego.palabraRandom = juego.palabras[Math.floor(aleatorio(0,1668))];
+    localStorage.setItem('PalabraAdivinar', juego.palabraRandom)
+}
+
 function cuantasVecesAparece(cadena, caracter){
     var indices = [];
     for(var h = 0; h < cadena.length; h++) {
@@ -85,6 +113,15 @@ function chequearPalabra(palabraCheck){
     col = 0
     juego.vidas --
     palabraFinal = ""
+    if(juego.vidas <= 0){
+        let palabrasNoAdivinadas = []
+        let storage = localStorage.getItem('palabrasNoAdivinadas')
+        if (storage != null) {
+            palabrasNoAdivinadas = storage
+        } 
+        palabrasNoAdivinadas.length == 0 ? palabrasNoAdivinadas = juego.palabraRandom : palabrasNoAdivinadas = palabrasNoAdivinadas + ',' + juego.palabraRandom
+        localStorage.setItem('palabrasNoAdivinadas', palabrasNoAdivinadas)
+    }
 }
 
 function rellenarBox(letra){
@@ -178,7 +215,7 @@ setTimeout(() => {
     juego.palabras = palabraArchivo
 }, 200);
 
-const juego = new Juego ([], 6, "", 0, 0, "", [], [])
+let juego = new Juego ([], 6, "", 0, 0, "", [], [])
 
 
 ArrayletrasAbecedario.forEach((letraEnArray, indice)=>{
@@ -188,7 +225,7 @@ ArrayletrasAbecedario.forEach((letraEnArray, indice)=>{
 
 for(i=0;i<=5;i++){
     divBox.innerHTML += `
-    <div class="row justify-content-center gap-1 pb-1" id="rowBox ${i}">
+    <div class="row justify-content-center gap-1 pb-1" id="rowBox ${i}"></div>
     `
     for(j=0;j<=4;j++){
         divBoxCol = document.getElementById(`rowBox ${i}`)
@@ -249,6 +286,23 @@ window.addEventListener("keydown", function (event) {
 
 let modalButton = document.getElementById("como_jugar")
 let modalEstadisticas = document.getElementById("estadisticas")
+let btnReinicioJuego = document.getElementById("reiniciar_juego")
+
+btnReinicioJuego.addEventListener('click', () => {
+   if(juego.vidas <= 0 || juego.victoria == 1 ){
+       reiniciarJuego()
+   } 
+   else
+   {
+    Toastify({
+        text: "Debes haber perdido o ganado el juego para reiniciar",
+        duration: 3000,
+        gravity: 'top',
+        position: 'right',
+    }).showToast();
+   }
+})
+
 
 modalButton.addEventListener('click', () => {
     swal({
@@ -266,9 +320,25 @@ modalButton.addEventListener('click', () => {
 })
 
 modalEstadisticas.addEventListener('click', () => {
+        let palabrasAdivinadas
+        let palabrasNoAdivinadas
+    if (localStorage.getItem('palabrasAdivinadas') != null){
+        palabrasAdivinadas = localStorage.getItem('palabrasAdivinadas')
+    }
+    else {
+        palabrasAdivinadas = "No acertaste ninguna palabra"
+    }
+    if(localStorage.getItem('palabrasNoAdivinadas') != null) {
+        palabrasNoAdivinadas = localStorage.getItem('palabrasNoAdivinadas')
+    }
+    else {
+        palabrasNoAdivinadas = "No erraste ninguna palabra"
+    }
+    
     swal({
         title: 'ESTADISTICAS',
-        text: `
+        text: ` Palabras Acertadas = ${palabrasAdivinadas}
+                Palabras No Acertadas = ${palabrasNoAdivinadas}
         `,
         icon: 'info'
         })
